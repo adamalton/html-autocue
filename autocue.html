@@ -1,7 +1,11 @@
 <html>
 <head>
 <meta charset="utf8">
+<link rel="stylesheet" type="text/css" href="bulma-0.9.0.css">
 <style type="text/css">
+	body {
+		margin: 20px;
+	}
 	#view,
 	body.view-mode #edit {
 		display: none;
@@ -78,7 +82,7 @@
 	<label for="scroll-delay">Delay before scrolling:</label>
 	<input type="text" id="scroll-delay" value="3" data-scroll-delay-input>
 	<div class="form-block">
-		<button data-start-button>Play</button>
+		<button class="button is-primary" data-start-button>Play</button>
 	</div>
 </div>
 
@@ -94,8 +98,8 @@
 	</div>
 
 	<div id="buttons">
-		<button data-restart-button>Restart</button>&nbsp;
-		<button data-stop-button>Stop</button>
+		<button class="button" data-restart-button>Restart</button>&nbsp;
+		<button class="button" data-stop-button>Stop</button>
 	</div>
 	<div id="help">Use arrow keys to boost or reduce scroll speed as you go</div>
 </div>
