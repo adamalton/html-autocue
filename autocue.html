@@ -8,12 +8,12 @@
 
 <div id="edit">
 
-	<label for="text">Enter text for auto-cue:</label>
-	<textarea id="text" data-text-input></textarea>
-	<label for="scroll-speed">Scroll speed:</label>
-	<input type="text" id="scroll-speed" value="200" data-scroll-speed-input>
-	<label for="scroll-delay">Delay before scrolling:</label>
-	<input type="text" id="scroll-delay" value="3" data-scroll-delay-input>
+	<label class="label" for="text">Enter text for auto-cue</label>
+	<textarea class="textarea" id="text" data-text-input></textarea>
+	<label class="label" for="scroll-speed">Scroll speed</label>
+	<input class="input" type="text" id="scroll-speed" value="200" data-scroll-speed-input>
+	<label class="label" for="scroll-delay">Delay before scrolling</label>
+	<input class="input" type="text" id="scroll-delay" value="3" data-scroll-delay-input>
 	<div class="form-block">
 		<button class="button is-primary" data-start-button>Play</button>
 	</div>
@@ -27,12 +27,12 @@
 	</div>
 
 	<div id="countdown">
-		<div id="countdown-text"></div>
+		<div id="countdown-text" class="has-text-primary"></div>
 	</div>
 
 	<div id="buttons">
-		<button class="button" data-restart-button>Restart</button>&nbsp;
-		<button class="button" data-stop-button>Stop</button>
+		<button class="button is-primary is-outlined" data-restart-button>Restart</button>&nbsp;
+		<button class="button is-primary is-outlined" data-stop-button>Stop</button>
 	</div>
 	<div id="help">Use arrow keys to boost or reduce scroll speed as you go</div>
 </div>

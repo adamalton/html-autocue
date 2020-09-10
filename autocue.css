@@ -13,8 +13,7 @@ label, .form-block {
 	margin-top: 1em;
 }
 #text {
-	height: 60%;
-	width: 80%;
+	height: 15em;
 }
 #view {
 	align-items: center;
@@ -38,21 +37,17 @@ label, .form-block {
 	align-items: center;
 	background: rgba(0, 0, 0, 0.5);
 	border-radius: 20px;
-	bottom: calc(50vh - 1em);
-	color: green;
+	bottom: calc(50vh - 1.5em);
 	display: none;
-	font-size: 120px;
-	height: 2em;
+	font-size: 160px;
+	height: 3em;
 	justify-content: center;
-	left: calc(50vw - 1em);
+	left: calc(50vw - 1.5em);
 	position: absolute;
-	right: calc(50vw - 1em);
-	top: calc(50vh - 1em);
-	width: 2em;
+	right: calc(50vw - 1.5em);
+	top: calc(50vh - 1.5em);
+	width: 3em;
 	z-index: 10;
-}
-#countdown-text {
-	-text-align: center;
 }
 #buttons {
 	position: absolute;
