@@ -1,0 +1,168 @@
+<html>
+<head>
+<meta charset="utf8">
+<style type="text/css">
+	#view,
+	body.view-mode #edit {
+		display: none;
+	}
+	body.view-mode #view {
+		display: flex;
+	}
+	label, .form-block {
+		display: block;
+		margin-top: 1em;
+	}
+	#text {
+		height: 60%;
+		width: 80%;
+	}
+	#view {
+		align-items: center;
+		bottom: 0;
+		left: 0;
+		position: absolute;
+		right: 0;
+		top: 0;
+
+	}
+	#marquee {
+		overflow: hidden;
+		width: 100%;
+	}
+	#marquee-text {
+		font-family: BlinkMacSystemFont,-apple-system,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue","Helvetica","Arial",sans-serif;
+		font-size: 48px;
+		white-space: nowrap;
+	}
+	#buttons {
+		position: absolute;
+		top: 5px;
+		right: 5px;
+	}
+	#help {
+		bottom: 5px;
+		left: 5px;
+		position: absolute;
+	}
+</style>
+</head>
+<body>
+
+<div id="edit">
+
+	<label for="text">Enter text for auto-cue:</label>
+	<textarea id="text" data-text-input></textarea>
+	<label for="scroll-speed">Scroll speed:</label>
+	<input type="text" id="scroll-speed" value="100" data-scroll-speed-input>
+	<label for="scroll-delay">Delay before scrolling:</label>
+	<input type="text" id="scroll-delay" value="3" data-scroll-delay-input>
+	<div class="form-block">
+		<button data-start-button>Play</button>
+	</div>
+</div>
+
+
+<div id="view">
+
+	<div id="marquee">
+		<div id="marquee-text"></div>
+	</div>
+
+	<div id="buttons">
+		<button data-restart-button>Restart</button>&nbsp;
+		<button data-stop-button>Stop</button>
+	</div>
+	<div id="help">Use arrow keys to boost or reduce scroll speed as you go</div>
+</div>
+
+
+
+
+<script>
+
+var scrollInterval = null;
+var scrollStepPixels = 2;
+var scrollBoost = 0;
+
+function start () {
+	const text = document.querySelector('[data-text-input]').value.trim();
+	// let sentences = text.split(/[\.\?\!]\n\n/g);
+	// console.log('sentences:', sentences);
+	const marqueeText = document.querySelector('#marquee-text');
+	// Start with the first word in the middle
+	const halfWidth = Math.round(document.querySelector('#marquee').clientWidth / 2);
+	marqueeText.style.marginLeft = halfWidth + 'px';
+	// We can't just set innerText, because that will keep the line breaks.
+	marqueeText.innerText = text;
+	marqueeText.innerHTML = marqueeText.innerHTML.replace(/<br>/g, '&nbsp;&nbsp;&nbsp;');
+	startScroll();
+}
+
+function stop () {
+	if (scrollInterval) {
+		clearInterval(scrollInterval);
+	}
+}
+
+function startScroll() {
+	const startDelay = parseInt(document.querySelector('[data-scroll-delay-input]').value, 10) * 1000;
+	const scrollSpeed = parseInt(document.querySelector('[data-scroll-speed-input]').value, 10);
+	setTimeout(
+		function() {
+			scrollInterval = setInterval(doScrollStep, 1000 / scrollSpeed);
+		},
+		startDelay
+	);
+}
+
+function doScrollStep() {
+	const marqueeText = document.querySelector('#marquee-text');
+	const currentMargin = parseInt(marqueeText.style.marginLeft.replace('px', ''), 10);
+	marqueeText.style.marginLeft = (currentMargin - scrollStepPixels - scrollBoost) + 'px';
+}
+
+function startButtonClick(event) {
+	document.body.classList.add('view-mode');
+	start();
+}
+
+function stopButtonClick(event) {
+	document.body.classList.remove('view-mode');
+	stop();
+}
+
+function restartButtonClick(event) {
+	stop();
+	start();
+}
+
+function documentKeyDown (event) {
+	// Activate scroll boost or reduction when arrow keys are pressed
+	if (['ArrowRight', 'ArrowUp'].includes(event.code)) {
+		scrollBoost = scrollStepPixels * 2;
+	} else if (['ArrowLeft', 'ArrowDown'].includes(event.code)) {
+		scrollBoost = scrollStepPixels * - 2;
+	}
+}
+
+function documentKeyUp(event) {
+	if (['ArrowRight', 'ArrowUp', 'ArrowLeft', 'ArrowDown'].includes(event.code)) {
+		// Any of the arrow keys released
+		scrollBoost = 0;
+	}
+}
+
+
+document.querySelector('[data-start-button]').addEventListener('click', startButtonClick);
+document.querySelector('[data-stop-button]').addEventListener('click', stopButtonClick);
+document.querySelector('[data-restart-button]').addEventListener('click', restartButtonClick);
+document.addEventListener('keydown', documentKeyDown);
+document.addEventListener('keyup', documentKeyUp);
+
+
+</script>
+
+
+</body>
+</html>
