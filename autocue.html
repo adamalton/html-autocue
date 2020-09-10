@@ -35,6 +35,26 @@
 		font-size: 48px;
 		white-space: nowrap;
 	}
+	#countdown {
+		align-items: center;
+		background: rgba(0, 0, 0, 0.5);
+		border-radius: 20px;
+		bottom: calc(50vh - 1em);
+		color: green;
+		display: none;
+		font-size: 120px;
+		height: 2em;
+		justify-content: center;
+		left: calc(50vw - 1em);
+		position: absolute;
+		right: calc(50vw - 1em);
+		top: calc(50vh - 1em);
+		width: 2em;
+		z-index: 10;
+	}
+	#countdown-text {
+		-text-align: center;
+	}
 	#buttons {
 		position: absolute;
 		top: 5px;
@@ -54,7 +74,7 @@
 	<label for="text">Enter text for auto-cue:</label>
 	<textarea id="text" data-text-input></textarea>
 	<label for="scroll-speed">Scroll speed:</label>
-	<input type="text" id="scroll-speed" value="100" data-scroll-speed-input>
+	<input type="text" id="scroll-speed" value="200" data-scroll-speed-input>
 	<label for="scroll-delay">Delay before scrolling:</label>
 	<input type="text" id="scroll-delay" value="3" data-scroll-delay-input>
 	<div class="form-block">
@@ -67,6 +87,10 @@
 
 	<div id="marquee">
 		<div id="marquee-text"></div>
+	</div>
+
+	<div id="countdown">
+		<div id="countdown-text"></div>
 	</div>
 
 	<div id="buttons">
@@ -103,17 +127,38 @@ function stop () {
 	if (scrollInterval) {
 		clearInterval(scrollInterval);
 	}
+	document.querySelector('#countdown').style.display = 'none';
 }
 
 function startScroll() {
 	const startDelay = parseInt(document.querySelector('[data-scroll-delay-input]').value, 10) * 1000;
 	const scrollSpeed = parseInt(document.querySelector('[data-scroll-speed-input]').value, 10);
+
+	if (startDelay) {
+		let countdownDisplayValue = startDelay / 1000;
+		for (let i = 0; i <= startDelay / 1000; i ++) {
+			setTimeout(updateCountdownDisplay, i * 1000, countdownDisplayValue);
+			countdownDisplayValue -= 1;
+		}
+	}
+
 	setTimeout(
 		function() {
 			scrollInterval = setInterval(doScrollStep, 1000 / scrollSpeed);
 		},
 		startDelay
 	);
+}
+
+function updateCountdownDisplay(value) {
+	const countdown = document.querySelector('#countdown');
+	if (value === 0) {
+		countdown.style.display = 'none';
+	} else {
+		countdown.style.display = 'flex';
+		const countdownText = document.querySelector('#countdown-text');
+		countdownText.innerText = value;
+	}
 }
 
 function doScrollStep() {
@@ -142,7 +187,7 @@ function documentKeyDown (event) {
 	if (['ArrowRight', 'ArrowUp'].includes(event.code)) {
 		scrollBoost = scrollStepPixels * 2;
 	} else if (['ArrowLeft', 'ArrowDown'].includes(event.code)) {
-		scrollBoost = scrollStepPixels * - 2;
+		scrollBoost = scrollStepPixels * -0.5;
 	}
 }
 
