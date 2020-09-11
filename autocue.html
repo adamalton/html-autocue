@@ -157,6 +157,8 @@ function stopButtonClick(event) {
 }
 
 function restartButtonClick(event) {
+	document.querySelector('[data-resume-button]').classList.add('is-hidden');
+	document.querySelector('[data-pause-button]').classList.remove('is-hidden');
 	stop();
 	start();
 }
