@@ -1,6 +1,7 @@
 <html>
 <head>
 	<meta charset="utf8">
+	<title>Auto Cue</title>
 	<link rel="stylesheet" type="text/css" href="bulma-0.9.0.css">
 	<link rel="stylesheet" type="text/css" href="autocue.css">
 </head>
@@ -31,10 +32,12 @@
 	</div>
 
 	<div id="buttons">
-		<button class="button is-primary is-outlined" data-restart-button>Restart</button>&nbsp;
-		<button class="button is-primary is-outlined" data-stop-button>Stop</button>
+		<button type="button" class="button is-primary is-outlined" data-restart-button>Restart</button>&nbsp;
+		<button type="button" class="button is-primary is-outlined" data-stop-button>Stop</button>
+		<button type="button" class="button is-primary" data-pause-button>Pause</button>
+		<button type="button" class="button is-primary is-hidden" data-resume-button>Resume</button>
 	</div>
-	<div id="help">Use arrow keys to boost or reduce scroll speed as you go</div>
+	<div id="help">Use arrow keys to boost or reduce scroll speed as you go. Press space bar to pause.</div>
 </div>
 
 
@@ -45,8 +48,54 @@
 var scrollInterval = null;
 var scrollStepPixels = 2;
 var scrollBoost = 0;
+var playStates = {
+	'STOPPED': 0,
+	'PLAYING': 1,
+	'PAUSED': 2,
+	'QUEUED': 3,
+};
+var playState = playStates.STOPPED;
 
 function start () {
+	initialiseMarqueeText();
+	startScrollWithDelay();
+}
+
+function stop () {
+	if (scrollInterval) {
+		clearInterval(scrollInterval);
+	}
+	playState = playStates.STOPPED;
+	document.querySelector('#countdown').style.display = 'none';
+}
+
+function togglePause () {
+	if (playState === playStates.PLAYING) {
+		pause();
+	} else if (playState === playStates.PAUSED) {
+		resume();
+	}
+	// TODO: handle QUEUED state - by pausing the queueing?!
+}
+
+function pause () {
+	console.log('pause, scrollInterval:', scrollInterval);
+	if (scrollInterval) {
+		clearInterval(scrollInterval);
+	}
+	playState = playStates.PAUSED;
+	document.querySelector('[data-resume-button]').classList.remove('is-hidden');
+	document.querySelector('[data-pause-button]').classList.add('is-hidden');
+}
+
+function resume () {
+	startScrollNow();
+	playState = playStates.PLAYING;
+	document.querySelector('[data-resume-button]').classList.add('is-hidden');
+	document.querySelector('[data-pause-button]').classList.remove('is-hidden');
+}
+
+function initialiseMarqueeText () {
 	const text = document.querySelector('[data-text-input]').value.trim();
 	// let sentences = text.split(/[\.\?\!]\n\n/g);
 	// console.log('sentences:', sentences);
@@ -57,19 +106,11 @@ function start () {
 	// We can't just set innerText, because that will keep the line breaks.
 	marqueeText.innerText = text;
 	marqueeText.innerHTML = marqueeText.innerHTML.replace(/<br>/g, '&nbsp;&nbsp;&nbsp;');
-	startScroll();
 }
 
-function stop () {
-	if (scrollInterval) {
-		clearInterval(scrollInterval);
-	}
-	document.querySelector('#countdown').style.display = 'none';
-}
-
-function startScroll() {
+function startScrollWithDelay() {
+	playState = playStates.QUEUED;
 	const startDelay = parseInt(document.querySelector('[data-scroll-delay-input]').value, 10) * 1000;
-	const scrollSpeed = parseInt(document.querySelector('[data-scroll-speed-input]').value, 10);
 
 	if (startDelay) {
 		let countdownDisplayValue = startDelay / 1000;
@@ -79,12 +120,13 @@ function startScroll() {
 		}
 	}
 
-	setTimeout(
-		function() {
-			scrollInterval = setInterval(doScrollStep, 1000 / scrollSpeed);
-		},
-		startDelay
-	);
+	setTimeout(startScrollNow, startDelay);
+}
+
+function startScrollNow() {
+	const scrollSpeed = parseInt(document.querySelector('[data-scroll-speed-input]').value, 10);
+	scrollInterval = setInterval(doScrollStep, 1000 / scrollSpeed);
+	playState = playStates.PLAYING;
 }
 
 function updateCountdownDisplay(value) {
@@ -125,6 +167,8 @@ function documentKeyDown (event) {
 		scrollBoost = scrollStepPixels * 2;
 	} else if (['ArrowLeft', 'ArrowDown'].includes(event.code)) {
 		scrollBoost = scrollStepPixels * -0.5;
+	} else if (event.code === 'Space') {
+		togglePause();
 	}
 }
 
@@ -139,6 +183,7 @@ function documentKeyUp(event) {
 document.querySelector('[data-start-button]').addEventListener('click', startButtonClick);
 document.querySelector('[data-stop-button]').addEventListener('click', stopButtonClick);
 document.querySelector('[data-restart-button]').addEventListener('click', restartButtonClick);
+document.querySelector('[data-pause-button],[data-resume-button]').addEventListener('click', togglePause);
 document.addEventListener('keydown', documentKeyDown);
 document.addEventListener('keyup', documentKeyUp);
 
